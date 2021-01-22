@@ -19,7 +19,6 @@ if  path.isfile(config_file):
     covenant_admin_url = covenant['connection']['covenant_admin_url']
     covenant_user = covenant['connection']['covenant_user']
     covenant_pass = covenant['connection']['covenant_pass']
-    covenant_token = covenant['connection']['covenant_token']
 
 configuration = swagger_client.Configuration()
 configuration.host = covenant_admin_url
@@ -28,8 +27,6 @@ configuration.password = covenant_pass
 configuration.verify_ssl = False
 configuration.get_basic_auth_token = True
 configuration.debug = False
-#configuration.api_key_prefix['Authorization'] = 'Bearer'
-#configuration.api_key = [covenant_token]
 
 CovenantUserLogin = swagger_client.models.CovenantUserLogin
 covenant_http_user = CovenantUserLogin(user_name=covenant_user, password=covenant_pass)

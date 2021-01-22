@@ -33,7 +33,6 @@ if  path.isfile(config_file):
     covenant_admin_url = covenant['connection']['covenant_admin_url']
     covenant_user = covenant['connection']['covenant_user']
     covenant_pass = covenant['connection']['covenant_pass']
-    covenant_token = covenant['connection']['covenant_token']
 
 configuration = swagger_client.Configuration()
 configuration.host = covenant_admin_url
