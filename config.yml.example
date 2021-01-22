@@ -1,0 +1,44 @@
+connection:
+     covenant_admin_url: "https://kali:7443"
+     covenant_user: "<user>"
+     covenant_pass: "<password>"
+
+listeners:
+     crto-http:
+          listenerType: HTTP
+          name: "CRTO-Lab-HTTP"
+          useSSL: false
+          description: "Listener for CRTO Lab"
+          bindAddress: 127.0.0.1
+          bindPort: 6666
+          connectAddressesType: auto # "manual" or "auto"
+          connectAddresses: ["10.8.0.182"]
+          connectAddressesInterface: tun0
+          connectPort: 80
+          profile: "DefaultHttpProfile"
+          status: "Active"
+  
+          
+     crto-bridge:
+          listenerType: bridge
+          name: "CRTO-Lab-Bridge"
+          Id: bbbbbb
+
+launchers:
+     powershell_http:
+          ListenerName: "CRTO-Lab-HTTP"
+          ImplantTemplate: "GruntHTTP"
+          DotNetVersion: "Net40"
+          LifeInDays: 60
+          LauncherType: "powerShell"
+          HostedURI: "/GruntHTTPStager.ps1"
+
+hosted_files:
+     hta_exploit:
+          ListenerName: "CRTO-Lab-HTTP"
+          HostedURI: "/overdue/login.hta"
+          SrcFile: "files/login.hta"
+     doc_exploit:
+          ListenerName: "CRTO-Lab-HTTP"
+          HostedURI: "/overdue/Invoice-0091662.doc"
+          SrcFile: "files/Invoice-0091662.doc"
