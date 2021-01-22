@@ -1,0 +1,16 @@
+[Unit]
+Description=Setup Covenant C2
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/Covenant/Covenant
+ExecStart=/usr/bin/dotnet run
+RemainAfterExit=true
+#ExecStop=/opt/foo/teardown-foo.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
