@@ -58,6 +58,7 @@ print("")
 grunt_api=swagger_client.GruntApiApi(swagger_client.ApiClient(configuration))
 
 for grunt in grunt_api.get_grunts():
+    #print(str(grunt.listener_id) + " " +str(grunt.listener) + " " + str(grunt.status) + " " + str(grunt.name) )
     if grunt.status == "exited" or grunt.status == "hidden":
         print("Deleted (" + grunt.status + ") Grunt: " + grunt.name)
         try:
