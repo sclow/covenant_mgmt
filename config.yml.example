@@ -2,6 +2,24 @@ connection:
      covenant_admin_url: "https://kali:7443"
      covenant_user: "<user>"
      covenant_pass: "<password>"
+     english-cookies:
+          name: "CRTO-en-gb-cookies"
+          description:
+          language: "CSharp"
+          commType: "HTTP"
+          implantDirection: "Push"
+          compatibleDotNetVersions: [ "Net35", "Net40"]
+          stagerCode: ""
+          executorCode: ""
+     english-no-cookies:
+          name: "CRTO-en-gb-no-cookies"
+          description:
+          language: "CSharp"
+          commType: "HTTP"
+          implantDirection: "Push"
+          compatibleDotNetVersions: [ "Net35", "Net40"]
+          stagerCode: ""
+          executorCode: ""
 
 listeners:
      crto-http:
