@@ -73,11 +73,13 @@ else:
 configuration.api_key['Authorization'] = authentication_response.covenant_token
 configuration.api_key_prefix['Authorization'] = 'Bearer'
 
-CovenantListenerProfile = swagger_client.models.HttpProfile
+CovenantHttpProfile = swagger_client.models.HttpProfile
 CovenantListenerType = swagger_client.models.ListenerType
 CovenantListener = swagger_client.models.Listener
 CovenantLauncher = swagger_client.models.Launcher
 CovenantHostedFile = swagger_client.models.HostedFile
+CovenantProfile = swagger_client.models.Profile
+
 
 user_api=swagger_client.CovenantUserApiApi(swagger_client.ApiClient(configuration))
 listener_api=swagger_client.ListenerApiApi(swagger_client.ApiClient(configuration))
@@ -85,13 +87,69 @@ profile_api=swagger_client.ProfileApiApi(swagger_client.ApiClient(configuration)
 launcher_api=swagger_client.LauncherApiApi(swagger_client.ApiClient(configuration))
 implant_template_api=swagger_client.ImplantTemplateApiApi(swagger_client.ApiClient(configuration))
 
+
 print("Authenticated as: '" + user_api.get_current_user().user_name +"'")
 print("")
 
-listener_profiles = profile_api.get_profiles()
-listener_types = listener_api.get_listener_types()
+print("Deploying Custom Listener Profiles:")
+
+for profile in covenant['profiles']:
+    profileObject = covenant['profiles'][profile]
+    #profile_api
+
+    print("Creating Listener Profile: " + str(profileObject['name']))
+    if profileObject['type'] == "HTTP":
+        print("Attempting to create HTTP profile: " + str(profileObject['name']))
+    else:
+        print("Cannot handle profiles of type: " + str(profileObject['type']))
+
+    #pprint(covenantprofile)
+
+    listener_profiles = profile_api.get_profiles()
+    current_profile = next((x for x in listener_profiles if x.name == str(profileObject['name']) ), None)
+    
+    if current_profile:
+        profile_id=current_profile.id
+        covenant_profile = CovenantHttpProfile(id=profile_id,
+                                            name=str(profileObject['name']),
+                                            description=str(profileObject['description']),
+                                            type=str(profileObject['type']),
+                                            http_get_response=str(profileObject['httpGetResponse']),
+                                            http_post_request=profileObject['httpPostRequest'],
+                                            http_post_response=profileObject['httpPostResponse'], 
+                                            http_urls=profileObject['httpUrls'],
+                                            http_request_headers=profileObject['httpRequestHeaders'] , 
+                                            http_response_headers=profileObject['httpResponseHeaders'] , 
+                                            message_transform=str(profileObject['messageTransform'])
+                                        )
+    else:
+        covenant_profile = CovenantHttpProfile(name=str(profileObject['name']),
+                                            description=str(profileObject['description']),
+                                            type=str(profileObject['type']),
+                                            http_get_response=str(profileObject['httpGetResponse']),
+                                            http_post_request=profileObject['httpPostRequest'],
+                                            http_post_response=profileObject['httpPostResponse'], 
+                                            http_urls=profileObject['httpUrls'],
+                                            http_request_headers=profileObject['httpRequestHeaders'] , 
+                                            http_response_headers=profileObject['httpResponseHeaders'] , 
+                                            message_transform=str(profileObject['messageTransform'])
+                                        )
+
+    print()
+    
+    try:
+        if current_profile:
+            covenantprofile = profile_api.edit_http_profile(body=covenant_profile)
+        else:
+            covenantprofile = profile_api.create_http_profile(body=covenant_profile)
+        
+    except ApiException as e:
+        print("Could Not Create Custom Listener Profiles: %s\n" % e)
 
 print("Creating Listeners:")
+listener_types = listener_api.get_listener_types()
+listener_profiles = profile_api.get_profiles()
+
 for listener in covenant['listeners']:
     listenerObject = covenant['listeners'][listener]
     if listenerObject['listenerType'] == "HTTP":
