@@ -51,6 +51,7 @@ else:
 configuration.api_key['Authorization'] = authentication_response.covenant_token
 configuration.api_key_prefix['Authorization'] = 'Bearer'
 user_api=swagger_client.CovenantUserApiApi(swagger_client.ApiClient(configuration))
+listener_api=swagger_client.ListenerApiApi(swagger_client.ApiClient(configuration))
 print("Authenticated as: '" + user_api.get_current_user().user_name +"'")
 print("")
 
