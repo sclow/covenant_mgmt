@@ -2,6 +2,7 @@ connection:
      covenant_admin_url: "https://kali:7443"
      covenant_user: "<user>"
      covenant_pass: "<password>"
+     default_kill_days_from_now: 20 # Make sure we dont accidentally kill grunts...
 
 
 listeners:
