@@ -2,24 +2,7 @@ connection:
      covenant_admin_url: "https://kali:7443"
      covenant_user: "<user>"
      covenant_pass: "<password>"
-     english-cookies:
-          name: "CRTO-en-gb-cookies"
-          description:
-          language: "CSharp"
-          commType: "HTTP"
-          implantDirection: "Push"
-          compatibleDotNetVersions: [ "Net35", "Net40"]
-          stagerCode: ""
-          executorCode: ""
-     english-no-cookies:
-          name: "CRTO-en-gb-no-cookies"
-          description:
-          language: "CSharp"
-          commType: "HTTP"
-          implantDirection: "Push"
-          compatibleDotNetVersions: [ "Net35", "Net40"]
-          stagerCode: ""
-          executorCode: ""
+
 
 listeners:
      crto-http:
@@ -30,7 +13,7 @@ listeners:
           bindAddress: 127.0.0.1
           bindPort: 6666
           connectAddressesType: auto # "manual" or "auto"
-          connectAddresses: ["10.8.0.182"]
+          connectAddresses: ["10.8.0.182"] # only used if "manual"
           connectAddressesInterface: tun0
           connectPort: 80
           profile: "DefaultHttpProfile"
@@ -60,3 +43,40 @@ hosted_files:
           ListenerName: "CRTO-Lab-HTTP"
           HostedURI: "/overdue/Invoice-0091662.doc"
           SrcFile: "files/Invoice-0091662.doc"
+
+profiles:
+     english-cookies:
+          name: "CRTO-en-gb-cookies"
+          description: "A Custom profile using cookies and an \"alternative\" language pack."
+          type: "HTTP"
+          httpUrls: 
+               - "/en-gb/index.html"
+               - "/en-gb/docs.html"
+               - "/en-gb/test.html" 
+          httpRequestHeaders: 
+               -  { name: "User-Agent", value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" }
+               -  { name: "Cookie", value: "ASPSESSIONID={GUID}; SESSIONID=1552332971750"} 
+          httpResponseHeaders: 
+               - { name: "Server", value: "Microsoft-IIS/7.5" } 
+          httpPostRequest: "i=a19ea23062db990386a3a478cb89d52e&data={DATA}&session=75db-99b1-25fe4e9afbe58696-320bea73"
+          httpGetResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
+          httpPostResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
+          messageTransform: "public static class MessageTransform\n{\n    public static string Transform(byte[] bytes)\n    {\n        return System.Convert.ToBase64String(bytes);\n    }\n    public static byte[] Invert(string str) {\n        return System.Convert.FromBase64String(str);\n    }\n}\n"
+
+
+     english-no-cookies:
+          name: "CRTO-en-gb-no-cookies"
+          description: "A Custom profile that doesnt use cookies and an \"alternative\" language pack."
+          type: "HTTP"
+          httpUrls: 
+               - "/en-gb/index.html?page={GUID}&v=1"
+               - "/en-gb/docs.html?type={GUID}&v=1"
+               - "/en-gb/test.html?message={GUID}&v=1"
+          httpRequestHeaders:  
+               - { name: "User-Agent", value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" } 
+          httpResponseHeaders: 
+               - { name: "Server", value: "Microsoft-IIS/7.5" } 
+          httpPostRequest: "i=a19ea23062db990386a3a478cb89d52e&data={DATA}&session=75db-99b1-25fe4e9afbe58696-320bea73"
+          httpGetResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
+          httpPostResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
+          messageTransform: "public static class MessageTransform\n{\n    public static string Transform(byte[] bytes)\n    {\n        return System.Convert.ToBase64String(bytes);\n    }\n    public static byte[] Invert(string str)\n    {\n        return System.Convert.FromBase64String(str);\n    }\n}\n"
