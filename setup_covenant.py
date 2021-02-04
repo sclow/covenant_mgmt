@@ -95,7 +95,6 @@ print("Deploying Custom Listener Profiles:")
 
 for profile in covenant['profiles']:
     profileObject = covenant['profiles'][profile]
-    #profile_api
 
     print("Creating Listener Profile: " + str(profileObject['name']))
     if profileObject['type'] == "HTTP":
@@ -103,12 +102,13 @@ for profile in covenant['profiles']:
     else:
         print("Cannot handle profiles of type: " + str(profileObject['type']))
 
-    #pprint(covenantprofile)
-
     listener_profiles = profile_api.get_profiles()
     current_profile = next((x for x in listener_profiles if x.name == str(profileObject['name']) ), None)
     
+    # ToDo: Identify how "/index.html?id={GUID}" gets prepended to URL's list and scrub it.
+
     if current_profile:
+        print("Updating existing profile")
         profile_id=current_profile.id
         covenant_profile = CovenantHttpProfile(id=profile_id,
                                             name=str(profileObject['name']),
@@ -123,6 +123,7 @@ for profile in covenant['profiles']:
                                             message_transform=str(profileObject['messageTransform'])
                                         )
     else:
+        print("Creating new profile")
         covenant_profile = CovenantHttpProfile(name=str(profileObject['name']),
                                             description=str(profileObject['description']),
                                             type=str(profileObject['type']),
@@ -134,14 +135,13 @@ for profile in covenant['profiles']:
                                             http_response_headers=profileObject['httpResponseHeaders'] , 
                                             message_transform=str(profileObject['messageTransform'])
                                         )
-
     print()
     
     try:
         if current_profile:
-            covenantprofile = profile_api.edit_http_profile(body=covenant_profile)
+            covenantprofile = profile_api.edit_http_profile_with_http_info(body=covenant_profile)
         else:
-            covenantprofile = profile_api.create_http_profile(body=covenant_profile)
+            covenantprofile = profile_api.create_http_profile_with_http_info(body=covenant_profile)
         
     except ApiException as e:
         print("Could Not Create Custom Listener Profiles: %s\n" % e)
