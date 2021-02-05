@@ -55,10 +55,16 @@ profiles:
                - "/en-gb/docs.html"
                - "/en-gb/test.html" 
           httpRequestHeaders: 
-               -  { name: "User-Agent", value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" }
-               -  { name: "Cookie", value: "ASPSESSIONID={GUID}; SESSIONID=1552332971750"} 
+               -  
+                    name: "User-Agent" 
+                    value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" 
+               -  
+                    name: "Cookie"
+                    value: "ASPSESSIONID={GUID}; SESSIONID=1552332971750"
           httpResponseHeaders: 
-               - { name: "Server", value: "Microsoft-IIS/7.5" } 
+               - 
+                    name: "Server"
+                    value: "Microsoft-IIS/7.5" 
           httpPostRequest: "i=a19ea23062db990386a3a478cb89d52e&data={DATA}&session=75db-99b1-25fe4e9afbe58696-320bea73"
           httpGetResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
           httpPostResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
@@ -73,10 +79,14 @@ profiles:
                - "/en-gb/index.html?page={GUID}&v=1"
                - "/en-gb/docs.html?type={GUID}&v=1"
                - "/en-gb/test.html?message={GUID}&v=1"
-          httpRequestHeaders:  
-               - { name: "User-Agent", value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" } 
+          httpRequestHeaders: 
+               -  
+                    name: "User-Agent" 
+                    value: "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36" 
           httpResponseHeaders: 
-               - { name: "Server", value: "Microsoft-IIS/7.5" } 
+               - 
+                    name: "Server"
+                    value: "Microsoft-IIS/7.5" 
           httpPostRequest: "i=a19ea23062db990386a3a478cb89d52e&data={DATA}&session=75db-99b1-25fe4e9afbe58696-320bea73"
           httpGetResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
           httpPostResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
