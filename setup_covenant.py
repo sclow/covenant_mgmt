@@ -79,6 +79,8 @@ CovenantListener = swagger_client.models.Listener
 CovenantLauncher = swagger_client.models.Launcher
 CovenantHostedFile = swagger_client.models.HostedFile
 CovenantProfile = swagger_client.models.Profile
+CovenantHttpProfile = swagger_client.models.HttpProfile
+CovenantHttpProfileHeader = swagger_client.models.HttpProfileHeader
 
 
 user_api=swagger_client.CovenantUserApiApi(swagger_client.ApiClient(configuration))
@@ -98,18 +100,18 @@ for profile in covenant['profiles']:
 
     print("Creating Listener Profile: " + str(profileObject['name']))
     if profileObject['type'] == "HTTP":
-        print("Attempting to create HTTP profile: " + str(profileObject['name']))
+        print("Attempting to handle HTTP profile: " + str(profileObject['name']))
     else:
         print("Cannot handle profiles of type: " + str(profileObject['type']))
 
     listener_profiles = profile_api.get_profiles()
     current_profile = next((x for x in listener_profiles if x.name == str(profileObject['name']) ), None)
     
-    # ToDo: Identify how "/index.html?id={GUID}" gets prepended to URL's list and scrub it.
-
     if current_profile:
         print("Updating existing profile")
         profile_id=current_profile.id
+
+
         covenant_profile = CovenantHttpProfile(id=profile_id,
                                             name=str(profileObject['name']),
                                             description=str(profileObject['description']),
@@ -118,8 +120,8 @@ for profile in covenant['profiles']:
                                             http_post_request=profileObject['httpPostRequest'],
                                             http_post_response=profileObject['httpPostResponse'], 
                                             http_urls=profileObject['httpUrls'],
-                                            http_request_headers=profileObject['httpRequestHeaders'] , 
-                                            http_response_headers=profileObject['httpResponseHeaders'] , 
+                                            http_request_headers=profileObject['httpRequestHeaders'], 
+                                            http_response_headers=profileObject['httpResponseHeaders'], 
                                             message_transform=str(profileObject['messageTransform'])
                                         )
     else:
@@ -131,17 +133,18 @@ for profile in covenant['profiles']:
                                             http_post_request=profileObject['httpPostRequest'],
                                             http_post_response=profileObject['httpPostResponse'], 
                                             http_urls=profileObject['httpUrls'],
-                                            http_request_headers=profileObject['httpRequestHeaders'] , 
-                                            http_response_headers=profileObject['httpResponseHeaders'] , 
+                                            http_request_headers= profileObject['httpRequestHeaders'], 
+                                            http_response_headers= profileObject['httpResponseHeaders'], 
                                             message_transform=str(profileObject['messageTransform'])
                                         )
+
     print()
     
     try:
         if current_profile:
-            covenantprofile = profile_api.edit_http_profile_with_http_info(body=covenant_profile)
+            covenantprofile = profile_api.edit_http_profile(body=covenant_profile)
         else:
-            covenantprofile = profile_api.create_http_profile_with_http_info(body=covenant_profile)
+            covenantprofile = profile_api.create_http_profile(body=covenant_profile)
         
     except ApiException as e:
         print("Could Not Create Custom Listener Profiles: %s\n" % e)
