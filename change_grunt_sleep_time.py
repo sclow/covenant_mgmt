@@ -11,7 +11,7 @@ from os import path
 import bios
 import sys
 from datetime import datetime, timedelta
-import uuid
+import shortuuid
 from dateutil.parser import parse
 
 config_file = 'config.yml'
@@ -35,6 +35,7 @@ CovenantGruntCommand = swagger_client.models.GruntCommand
 CovenantGruntCommandOutput = swagger_client.models.CommandOutput
 CovenantGruntTask = swagger_client.models.GruntTask
 CovenantGruntTasking = swagger_client.models.GruntTasking
+
 
 covenant_http_user = CovenantUserLogin(user_name=covenant_user, password=covenant_pass)
 
@@ -87,7 +88,7 @@ except Exception as e:
     print("Couldn't parse that input, will use the default of '" + str(delaytime) + "' seconds.")
 
 
-print("Will configured grunt's to use: '" + str(delaytime))
+print("Will configure grunt's to use: '" + str(delaytime) + "' second delay.")
 print("")
 
 # Identify "Delay" Task
@@ -95,10 +96,23 @@ print("")
 task = next((x for x in grunt_tasks if x.name == "Delay" ), None)
 if task:
     task_id = task.id 
+    task_options = task.options[0]
+    task_options.value = str(delaytime)
 else:
     print("Could not find task 'Delay'")
     exit()
 
+
+print("Updating new task value to be " + str(delaytime) + " for: '" + str(task.name) + "'")
+print("")
+try:
+    # Attempt update task with new value
+    update_task=grunt_task_api.edit_grunt_task(body=task)
+
+except ApiException as e:
+    print("Could not update task value: %s\n" % e)
+
+print("")
 print("Current Listeners: ")
 for listener in current_listeners:
         print(str(listener.id) + ": " + str(listener.name))
@@ -117,28 +131,33 @@ for grunt in grunt_api.get_grunts():
     if current_listener_id == 0 or grunt.listener_id == current_listener_id:
         # current_listener_id is an the same as our grunt.listener_id
         # OR it is zero (do for all grunts) 
-        delaycommand = "Delay /seconds:\"" + str(delaytime) + "\""
-        
-
-        grunt_command = CovenantGruntCommand(command=delaycommand,
+        try:
+            delaycommand = "Delay /seconds:\"" + str(delaytime) + "\""
+            grunt_command = CovenantGruntCommand(command=delaycommand,
                                                 command_time=datetime.now(),
                                                 command_output_id=grunt_command_output_api.create_command_output().id,
                                                 user_id=str(current_user.id),
                                                 grunt_id=grunt.id
                                             )
 
-
-        try:
+            
             grunt_command_output = grunt_command_api.create_grunt_command(body=grunt_command)
-            grunt_tasking = CovenantGruntTasking(name=str(uuid.uuid4().hex),
+            if grunt_command_output:
+                
+                grunt_tasking = CovenantGruntTasking(name=shortuuid.ShortUUID().random(length=10).lower(),
                                             grunt_id=grunt.id,
                                             grunt_task_id=task.id,
+                                            type=task.tasking_type,
                                             grunt_command_id=grunt_command_output.id
                                         )
 
-            grunt_tasking_output = grunt_tasking_api.create_grunt_tasking(body=grunt_tasking)
+                grunt_tasking_output = grunt_tasking_api.create_grunt_tasking(body=grunt_tasking)
+                print("Updated Grunt: '" + grunt.name + "' to have delay time  of '" + str(delaytime) + "' via tasking: '" + str(grunt_tasking_output.id) + "'")
+                
+            else:
+                print("Filed to create grunt command")
             
-            print("Updated Grunt: '" + grunt.name + "' to have delay time  of '" + str(delaytime) + "' via tasking: '" + str(grunt_tasking_output.id) + "'")
+            
         except ApiException as e:
             print("Could not update grunt: %s\n" % e)
 
