@@ -11,7 +11,7 @@ from os import path
 import bios
 import sys
 from datetime import datetime, timedelta
-import uuid
+import shortuuid
 from dateutil.parser import parse
 
 config_file = 'config.yml'
@@ -69,10 +69,12 @@ grunt_command_api = swagger_client.GruntCommandApiApi(swagger_client.ApiClient(c
 grunt_task_api=swagger_client.GruntTaskApiApi(swagger_client.ApiClient(configuration))
 grunt_tasking_api=swagger_client.GruntTaskingApiApi(swagger_client.ApiClient(configuration))
 grunt_command_output_api = swagger_client.CommandOutputApiApi(swagger_client.ApiClient(configuration))
+grunt_task_options_api = swagger_client.GruntTaskOption(swagger_client.ApiClient(configuration))
 
 # Iterate through all current listeners
 current_listeners = listener_api.get_listeners()
 grunt_tasks = grunt_task_api.get_grunt_tasks()
+#grunt_task_options = grunt_task_options_api.
 
 # Set the date we want Grunts to terminate
 print("Enter the ISO date/time that you want Grunts to terminate.")
@@ -97,9 +99,22 @@ print("")
 task = next((x for x in grunt_tasks if x.name == "KillDate" ), None)
 if task:
     task_id = task.id 
+    task_options = task.options[0]
+    task_options.value = str(killdate)
 else:
     print("Could not find task 'KillDate'")
     exit()
+
+print("Updating new task value to be " + str(killdate) + " for: '" + str(task.name) + "'")
+print("")
+try:
+    # Attempt update task with new value
+    update_task=grunt_task_api.edit_grunt_task(body=task)
+
+except ApiException as e:
+    print("Could not update task value: %s\n" % e)
+
+print("")
 
 print("Current Listeners: ")
 for listener in current_listeners:
@@ -118,29 +133,32 @@ except Exception as e:
 for grunt in grunt_api.get_grunts():
     if current_listener_id == 0 or grunt.listener_id == current_listener_id:
         # current_listener_id is an the same as our grunt.listener_id
-        # OR it is zero (do for all grunts) 
-        killcommand = "KillDate /:date\"" + str(killdate) + "\""
-        
-
-        grunt_command = CovenantGruntCommand(command=killcommand,
+        # OR it is zero (do for all grunts)
+        try:
+            #killcommand = "KillDate \"" + str(killdate) + "\""
+            killcommand = str(killdate)
+            grunt_command = CovenantGruntCommand(command=killcommand,
                                                 command_time=datetime.now(),
                                                 command_output_id=grunt_command_output_api.create_command_output().id,
                                                 user_id=str(current_user.id),
                                                 grunt_id=grunt.id
                                             )
 
-
-        try:
             grunt_command_output = grunt_command_api.create_grunt_command(body=grunt_command)
-            grunt_tasking = CovenantGruntTasking(name=str(uuid.uuid4().hex),
-                                            grunt_id=grunt.id,
-                                            grunt_task_id=task.id,
-                                            grunt_command_id=grunt_command_output.id
-                                        )
+            if grunt_command_output.id:
+                grunt_tasking = CovenantGruntTasking(name=shortuuid.ShortUUID().random(length=10).lower(),
+                                                grunt_id=grunt.id,
+                                                grunt_task_id=task.id,
+                                                type=task.tasking_type,
+                                                grunt_command_id=grunt_command_output.id
+                                            )
 
-            grunt_tasking_output = grunt_tasking_api.create_grunt_tasking(body=grunt_tasking)
-            
-            print("Updated Grunt: '" + grunt.name + "' to have killdate of '" + str(killdate) + "' via tasking: '" + str(grunt_tasking_output.id) + "'")
+                grunt_tasking_output = grunt_tasking_api.create_grunt_tasking(body=grunt_tasking)
+                
+                print("Updated Grunt: '" + grunt.name + "' to have killdate of '" + str(killdate) + "' via tasking: '" + str(grunt_tasking_output.id) + "'")
+            else:
+                print("Filed to create grunt command")
+
         except ApiException as e:
             print("Could not update grunt: %s\n" % e)
 
