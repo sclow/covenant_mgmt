@@ -3,6 +3,7 @@ connection:
      covenant_user: "<user>"
      covenant_pass: "<password>"
      default_kill_days_from_now: 20 # Make sure we dont accidentally kill grunts...
+     default_grunt_delay_time: 5 # Sleep 5 seconds between task requests
 
 
 listeners:
