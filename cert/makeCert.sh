@@ -60,7 +60,7 @@ function make_covenant_cert {
     show_covenant_config;
 }
 
-if [[ -f "${COV_PEM}" ]] || [[ -f "${COV_PASS}" ]] ;  then
+if [[ -f "${COV_PFX}" ]] || [[ -f "${COV_PASS}" ]] ;  then
     echo "Files already exist.."
     show_covenant_config;
 else
