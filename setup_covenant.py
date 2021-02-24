@@ -178,7 +178,12 @@ for listener in covenant['listeners']:
                                             profile_id=profile_id, 
                                             listener_type_id=listenertype_id, 
                                             status=listenerObject['status'] )
-            
+        if listenerObject['useSSL'] :
+            covenantlistner['useSSL'] = "true"
+            covenantlistner['sslCertificate'] = listenerObject['sslCertificate']
+            covenantlistner['sslCertificatePassword'] = listenerObject['sslCertificatePassword']
+            covenantlistner['sslCertHash'] = listenerObject['sslCertHash']
+
         try:
             listener_api.create_http_listener_with_http_info(body=covenantlistner)
         except ApiException as e:
