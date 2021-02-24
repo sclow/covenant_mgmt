@@ -19,7 +19,7 @@ function show_covenant_config {
     echo ""
     PASSPHRASE=`cat ${COV_PASS}`
     PEM=`cat  ${COV_PFX} | base64 -w 0`
-    HASH=""
+    HASH=`openssl x509 -in ${COV_CRT} -fingerprint | grep SHA | cut -f2 -d "=" | tr -d ":"`
 
     echo -e "\t\tsslCertificate: \"${PEM}\""
     echo -e "\t\tsslCertificatePassword: \"${PASSPHRASE}\""
