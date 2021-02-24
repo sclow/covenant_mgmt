@@ -18,7 +18,7 @@ function show_covenant_config {
     echo "Use the following configuration to access this certificate:"
     echo ""
     PASSPHRASE=`cat ${COV_PASS}`
-    PEM=""
+    PEM=`cat  ${COV_PFX} | base64 -w 0`
     HASH=""
 
     echo -e "\t\tsslCertificate: \"${PEM}\""
