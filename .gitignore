@@ -1,3 +1,4 @@
 config.yml
 files/*hta
-templates/*.json
+files/*doc
+templates/*json
