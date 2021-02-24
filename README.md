@@ -9,6 +9,16 @@ You will need to set up a config.yml file (based on the example with this projec
 * profiles - Listener Profiles (in case you dont want to use the defaults)
 * templates - GRUNT templates in JSON that you have modified.
 
+## Patch Covenant API
+Versions of Covenant without the PR https://github.com/cobbr/Covenant/pull/284 will have issues with the API when creating custom profiles. 
+
+This is due to the default values applied to new listener profiles also being applied to changed / custom profiles via the API. The result is a URL deadlock that causes GRUNTS to perform poorly / become lost.
+
+Apply the PR and rebuild covenant as you start your exercise. 
+
+```sudo dotnet run```
+
+
 ## Setup Covenant
 Typically you will need to log onto Covenant *once* to set up the first user and password. 
 
