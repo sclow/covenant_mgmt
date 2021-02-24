@@ -42,13 +42,14 @@ configuration.verify_ssl = False
 configuration.get_basic_auth_token = True
 configuration.debug = False
 
-# Check our hosting files actually exist
-for hosted_file in covenant['hosted_files']:
-    hosted_file_object = covenant['hosted_files'][hosted_file]
+# Check our hosting files actually exist (If we have any) 
+if covenant['hosted_files'] is not None:
+    for hosted_file in covenant['hosted_files']:
+        hosted_file_object = covenant['hosted_files'][hosted_file]
 
-    if not path.isfile(hosted_file_object['SrcFile']):
-        print("Could not find source file '" + hosted_file_object['SrcFile'] + "' for '" + hosted_file_object['HostedURI'] + "'")
-        exit()
+        if not path.isfile(hosted_file_object['SrcFile']):
+            print("Could not find source file '" + hosted_file_object['SrcFile'] + "' for '" + hosted_file_object['HostedURI'] + "'")
+            exit()
 
 CovenantUserLogin = swagger_client.models.CovenantUserLogin
 covenant_http_user = CovenantUserLogin(user_name=covenant_user, password=covenant_pass)
@@ -276,45 +277,47 @@ for launcher in covenant['launchers']:
             
 
 print("")
-print("Hosting files:")   
-for hosted_file in covenant['hosted_files']:
-    hosted_file_object = covenant['hosted_files'][hosted_file]
-    print("Attempting to host: '" + hosted_file_object['SrcFile'] + "' as '" + hosted_file_object['HostedURI'] + "' on listener '" + hosted_file_object['ListenerName'] + "'")
-    
-    with open(hosted_file_object['SrcFile'], "rb") as image_file:
-        base64_file_contents = "".join( chr(x) for x in base64.b64encode(image_file.read()))
+if covenant['hosted_files'] is not None:
+    print("Hosting files:")   
+    for hosted_file in covenant['hosted_files']:
+        hosted_file_object = covenant['hosted_files'][hosted_file]
+        print("Attempting to host: '" + hosted_file_object['SrcFile'] + "' as '" + hosted_file_object['HostedURI'] + "' on listener '" + hosted_file_object['ListenerName'] + "'")
         
-    
-    listener = next((x for x in listeners if x.status == "active" and x.name == str(hosted_file_object['ListenerName'])), None)
-    if listener:
-        listener_id=listener.id
-
-    hosted_files = listener_api.get_hosted_files(listener_id)
-    hostedfile = next((x for x in hosted_files if x.path == str(hosted_file_object['HostedURI']) ), None)
+        with open(hosted_file_object['SrcFile'], "rb") as image_file:
+            base64_file_contents = "".join( chr(x) for x in base64.b64encode(image_file.read()))
             
-    if hostedfile:
-        hostedfile_id=hostedfile.id
-        file_to_host = CovenantHostedFile( 
-                                            id=hostedfile_id,  
-                                            listener_id = listener_id, 
-                                            path = str(hosted_file_object['HostedURI']),
-                                            content = base64_file_contents
-                                            )
-    else:
-        file_to_host = CovenantHostedFile(   
-                                            listener_id = listener_id, 
-                                            path = str(hosted_file_object['HostedURI']),
-                                            content = base64_file_contents
-                                            )
-
-    try:
-        if hostedfile:
-            file_hosted = listener_api.edit_hosted_file(listener_id, body=file_to_host)
-        else:
-            file_hosted = listener_api.create_hosted_file(listener_id, body=file_to_host)
         
-    except ApiException as e:
-        print("Could not create hosted file: %s\n" % e)
+        listener = next((x for x in listeners if x.status == "active" and x.name == str(hosted_file_object['ListenerName'])), None)
+        if listener:
+            listener_id=listener.id
 
+        hosted_files = listener_api.get_hosted_files(listener_id)
+        hostedfile = next((x for x in hosted_files if x.path == str(hosted_file_object['HostedURI']) ), None)
+                
+        if hostedfile:
+            hostedfile_id=hostedfile.id
+            file_to_host = CovenantHostedFile( 
+                                                id=hostedfile_id,  
+                                                listener_id = listener_id, 
+                                                path = str(hosted_file_object['HostedURI']),
+                                                content = base64_file_contents
+                                                )
+        else:
+            file_to_host = CovenantHostedFile(   
+                                                listener_id = listener_id, 
+                                                path = str(hosted_file_object['HostedURI']),
+                                                content = base64_file_contents
+                                                )
+
+        try:
+            if hostedfile:
+                file_hosted = listener_api.edit_hosted_file(listener_id, body=file_to_host)
+            else:
+                file_hosted = listener_api.create_hosted_file(listener_id, body=file_to_host)
+            
+        except ApiException as e:
+            print("Could not create hosted file: %s\n" % e)
+else:
+    print("No files defined for hosting")
 print("")
 print("All Done")
