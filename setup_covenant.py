@@ -25,6 +25,8 @@ def getConnectionAddresses(listenerObject):
 
         return ipaddresses
 
+def str2bool(s):
+    return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 config_file = 'config.yml'
 
@@ -96,7 +98,6 @@ print("Authenticated as: '" + user_api.get_current_user().user_name +"'")
 print("")
 
 print("Deploying Custom Listener Profiles:")
-
 for profile in covenant['profiles']:
     profileObject = covenant['profiles'][profile]
 
@@ -151,6 +152,28 @@ for profile in covenant['profiles']:
     except ApiException as e:
         print("Could Not Create Custom Listener Profiles: %s\n" % e)
 
+print("Deploying Custom Grunt Templates:")
+if covenant['templates'] is not None:
+    for template in covenant['templates']:
+        templateObject = covenant['templates'][template]
+
+        template_file = "templates/"+str(templateObject['file'])
+
+        if  path.isfile(template_file):
+            with open(template_file) as f:
+                template_configuration = json.load(f)
+
+                try:
+                    implant_template_api.edit_implant_template(body=template_configuration)
+                except ApiException as e:
+                    print("Could not create grunt template: %s\n" % e)
+                        
+        else:
+            print("Could not find template file: " + template_file)
+            exit()
+
+print("")
+
 print("Creating Listeners:")
 listener_types = listener_api.get_listener_types()
 listener_profiles = profile_api.get_profiles()
@@ -180,7 +203,7 @@ for listener in covenant['listeners']:
                                             profile_id=profile_id, 
                                             urls=http_profile.http_urls,
                                             listener_type_id=listenertype_id, 
-                                            use_ssl=bool(listenerObject['useSSL']),
+                                            use_ssl=str2bool(str(listenerObject['useSSL'])),
                                             ssl_certificate=listenerObject['sslCertificate'],
                                             ssl_certificate_password=listenerObject['sslCertificatePassword'],
                                             ssl_cert_hash=listenerObject['sslCertHash'],
