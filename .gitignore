@@ -2,3 +2,4 @@ config.yml
 files/*hta
 files/*doc
 templates/*json
+cert/covenant*
