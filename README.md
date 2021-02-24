@@ -1,4 +1,83 @@
 # Covenant Management
+## Configuration file
+You will need to set up a config.yml file (based on the example with this project), the config file itself should be relatively readable however the key stanzas are as follows:
+
+* connection - How the management scripts should connect to your Covenant Instance
+* listeners - Listeners you want to deploy and start
+* launchers - Pre-configure launchers to work with hosted listeners
+* hosted_files - Files you want to host on specific URL's within a listener
+* profiles - Listener Profiles (in case you dont want to use the defaults)
+* templates - GRUNT templates in JSON that you have modified.
+
+## Setup Covenant
+Typically you will need to log onto Covenant *once* to set up the first user and password. 
+
+Once that has been configured (and set in config.yml) you can run an entire configuration exercise using the command:
+
+```./setup_covenant.py```
+
+You will see it stepping through each stage of the configuration and if it comes into difficulties hopefully give error messages that will help you troubleshoot.
+
+### Covenant with SSL
+It can be very useful to run Covenant over an HTTPS (instead of HTTP) listener. 
+This "just" needs you to create a PFX file with known password that can be applied to the listener. 
+
+In most circumstances you will want to use a valid cert (especially if domain fronting) as it will allow you to perform certificate validation (pinning).
+
+However, if you want a quick and dirty SSL certificate for testing, consider running:
+
+```certs/makeCert.sh```
+
+### Custom GRUNT Templates
+One of the nice features of Covenant is the ability to modify / extend the templates to your taste.
+
+It can be desireable to configure and test templates in a lab environment before using them on an exercise.
+
+The easiest way to edit a template is to copy the code from a Grunt variant and import it into Visual Studio Console App (.NET Framework) as a new project. 
+
+Once you have working code copy it back to that Covenant using the Web GUI for testing. 
+
+Once you are happy with your Custom GRUNT template use the swagger_api to back the templates up using the following procedure:
+
+E.g. for a Covenant instance running on "https://kali:7443/" you can access the Swagger UI at "https://kali:7443/swagger/", authenticate (POST /api/users/login) and set your Bearer to allow other commands.
+
+* Authenticate!
+* GET (​/api​/implanttemplates​/{id}) Each of your templates (by default only 4)
+* Save the template to templates/${TemplateName}.json (expanding ${TemplateName} as you do so)
+* Configure the "templates" stanza of config.yml to point to "${TemplateName}.json" (or whatever name you saved it as) within the "templates/" folder.
+* Run ```./setup_covenant.py``` to deploy custom templates with your configuration.
+
+**Note:** Templates defined in this section will overwrite whatever is in your current Covenant instance without prompting. 
+Test carefully in a Lab before using custom Templates on a live exercise; think very carefully before updating the templates whilst "inflight".
+
+## Cleanup Dead / Hidden Grunts
+Performance issues can appear if the Covenant DB starts to get too large; if you have a lot of dead / hidden GRUNTS that you are no longer using you can purge them using the command:
+
+```./cleanup_grunts.py```
+
+**Note**: If you purge Grunts you lose part of your audit trail.
+
+## Change Killdate on current Grunts
+There are times when you want to change the end date of an exercise (e.g. terminate it early or extend it by a few days).
+
+You can use the command:
+
+```./change_grunt_kill_date.py``` 
+
+To change the kill date of all active Grunts (or just those on a specific listener).
+
+Follow the prompts and use ISO conformant Date/Times.
+Experiment before you run it on a live exercise!
+
+## Change Sleeptime on current Grunts
+It can be handy during an engagement to "go quiet" for a period of time. 
+Therefore it is nice to be able to make all current Grunts sleep for a period of time.
+
+The command:
+```./change_grunt_sleep_time.py``` 
+Can be used to mass-change the "delay" time on all Grunts (or just those on a specific listner).
+
+Note: whilst you *can* reduce the sleep time for all Grunts (e.g. to 1 second), this will significantly degrade any ability to evade monitoring.
 
 
 ## Getting Swagger Client
