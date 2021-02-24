@@ -77,6 +77,7 @@ configuration.api_key_prefix['Authorization'] = 'Bearer'
 CovenantHttpProfile = swagger_client.models.HttpProfile
 CovenantListenerType = swagger_client.models.ListenerType
 CovenantListener = swagger_client.models.Listener
+CovenantHTTPListener = swagger_client.models.HttpListener
 CovenantLauncher = swagger_client.models.Launcher
 CovenantHostedFile = swagger_client.models.HostedFile
 CovenantProfile = swagger_client.models.Profile
@@ -154,21 +155,22 @@ print("Creating Listeners:")
 listener_types = listener_api.get_listener_types()
 listener_profiles = profile_api.get_profiles()
 
+
 for listener in covenant['listeners']:
     listenerObject = covenant['listeners'][listener]
     if listenerObject['listenerType'] == "HTTP":
         print("Creating HTTP Listener: " + str(listenerObject['name']))
         
-        # Find first object in list that matches value..
         profile = next((x for x in listener_profiles if x.name == str(listenerObject['profile'])), None)
         if profile:
             profile_id = profile.id 
-
+            http_profile = profile_api.get_http_profile(profile.id)
+        
         listenertype = next((x for x in listener_types if x.name == str(listenerObject['listenerType'])), None)
         if listenertype:
             listenertype_id = listenertype.id      
         
-        covenantlistner = CovenantListener(name=str(listenerObject['name']), 
+        covenantlistner = CovenantHTTPListener(name=str(listenerObject['name']), 
                                             guid=str(uuid.uuid4().hex), 
                                             description=str(listenerObject['description']), 
                                             bind_address=listenerObject['bindAddress'],
@@ -176,13 +178,13 @@ for listener in covenant['listeners']:
                                             connect_addresses=getConnectionAddresses(listenerObject), 
                                             connect_port=listenerObject['connectPort'], 
                                             profile_id=profile_id, 
+                                            urls=http_profile.http_urls,
                                             listener_type_id=listenertype_id, 
+                                            use_ssl=bool(listenerObject['useSSL']),
+                                            ssl_certificate=listenerObject['sslCertificate'],
+                                            ssl_certificate_password=listenerObject['sslCertificatePassword'],
+                                            ssl_cert_hash=listenerObject['sslCertHash'],
                                             status=listenerObject['status'] )
-        if listenerObject['useSSL'] :
-            covenantlistner['useSSL'] = "true"
-            covenantlistner['sslCertificate'] = listenerObject['sslCertificate']
-            covenantlistner['sslCertificatePassword'] = listenerObject['sslCertificatePassword']
-            covenantlistner['sslCertHash'] = listenerObject['sslCertHash']
 
         try:
             listener_api.create_http_listener_with_http_info(body=covenantlistner)
