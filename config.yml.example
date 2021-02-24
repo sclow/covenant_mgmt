@@ -92,3 +92,9 @@ profiles:
           httpGetResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
           httpPostResponse: "<html>\n    <head>\n        <title>Hello World!</title>\n    </head>\n    <body>\n        <p>Hello World!</p>\n        // Hello World! {DATA}\n    </body>\n</html>"
           messageTransform: "public static class MessageTransform\n{\n    public static string Transform(byte[] bytes)\n    {\n        return System.Convert.ToBase64String(bytes);\n    }\n    public static byte[] Invert(string str)\n    {\n        return System.Convert.FromBase64String(str);\n    }\n}\n"
+
+templates:
+     # GruntHTTP: false
+     # GruntSMB: false
+     # GruntBridge: false
+     # Brute: false
