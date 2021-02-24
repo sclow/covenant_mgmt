@@ -11,6 +11,9 @@ listeners:
           listenerType: HTTP
           name: "CRTO-Lab-HTTP"
           useSSL: false
+          sslCertificate: ""
+          sslCertificatePassword: ""
+          sslCertHash: ""
           description: "Listener for CRTO Lab"
           bindAddress: 127.0.0.1
           bindPort: 6666
