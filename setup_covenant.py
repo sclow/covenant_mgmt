@@ -85,6 +85,7 @@ CovenantHostedFile = swagger_client.models.HostedFile
 CovenantProfile = swagger_client.models.Profile
 CovenantHttpProfile = swagger_client.models.HttpProfile
 CovenantHttpProfileHeader = swagger_client.models.HttpProfileHeader
+CovenantImplantTemplate = swagger_client.models.ImplantTemplate
 
 
 user_api=swagger_client.CovenantUserApiApi(swagger_client.ApiClient(configuration))
@@ -158,10 +159,28 @@ if covenant['templates'] is not None:
         templateObject = covenant['templates'][template]
 
         template_file = "templates/"+str(templateObject['file'])
+        compatibleListenerTypesArray = []
 
         if  path.isfile(template_file):
             with open(template_file) as f:
                 template_configuration = json.load(f)
+                print("Attempting to deploy template for: " + template)
+                for compatibleListenerType in template_configuration["compatibleListenerTypes"]:
+                    compatibleListenerTypesArray.append(compatibleListenerType)
+                
+                custom_template = CovenantImplantTemplate ( id= template_configuration["id"],
+                                                            name= template_configuration["name"],
+                                                            description= template_configuration["description"],
+                                                            implant_direction= template_configuration["implantDirection"],
+                                                            language= template_configuration["language"],
+                                                            stager_code= template_configuration["stagerCode"],
+                                                            executor_code= template_configuration["executorCode"],
+                                                            comm_type= template_configuration["commType"],
+                                                            compatible_dot_net_versions= template_configuration["compatibleDotNetVersions"],
+                                                            compatible_listener_types= compatibleListenerTypesArray
+                                    )
+
+                pprint(custom_template.compatible_listener_types)
 
                 try:
                     implant_template_api.edit_implant_template(body=template_configuration)
@@ -173,6 +192,7 @@ if covenant['templates'] is not None:
             exit()
 
 print("")
+exit()
 
 print("Creating Listeners:")
 listener_types = listener_api.get_listener_types()
