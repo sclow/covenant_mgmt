@@ -180,8 +180,6 @@ if covenant['templates'] is not None:
                                                             compatible_listener_types= compatibleListenerTypesArray
                                     )
 
-                pprint(custom_template.compatible_listener_types)
-
                 try:
                     implant_template_api.edit_implant_template(body=template_configuration)
                 except ApiException as e:
