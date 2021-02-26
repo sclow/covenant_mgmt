@@ -29,7 +29,7 @@ def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 def generate_launcher(config):
-    if str(config['LauncherType']) == "PowerShell":
+    if str(config['LauncherType']) == "powerShell":
         generated = launcher_api.generate_power_shell_launcher(body=config)
     elif str(config['LauncherType']) == "":
         generated = "second thing"
@@ -43,7 +43,7 @@ def generate_launcher(config):
     return generated
     
 def edit_launcher(config):
-     if str(config['LauncherType']) == "PowerShell":
+     if str(config['LauncherType']) == "powerShell":
         generated = launcher_api.edit_power_shell_launcher(body=config)
     elif str(config['LauncherType']) == "":
         generated = "second thing"
