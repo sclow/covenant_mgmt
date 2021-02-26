@@ -29,10 +29,32 @@ def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 def generate_launcher(config):
-    pprint(config)
+    if str(config.launcherType) == "":
+        generated = "first thing"
+    elif str(config.launcherType) == "":
+        generated = "second thing"
+    elif str(config.launcherType) == "":
+        generated = "third thing"
+    else:
+        print("Don't know how to handle launcher of type: " + str(config.launcherType))
+        exit()
+    
+    #pprint(generated)
+    return generated
     
 def edit_launcher(config):
-    pprint(config)
+     if str(config.launcherType) == "":
+        generated = "first thing"
+    elif str(config.launcherType) == "":
+        generated = "second thing"
+    elif str(config.launcherType) == "":
+        generated = "third thing"
+    else:
+        print("Don't know how to handle launcher of type: " + str(config.launcherType))
+        exit()
+    
+    #pprint(generated)
+    return generated
     
 config_file = 'config.yml'
 
