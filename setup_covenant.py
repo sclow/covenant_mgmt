@@ -29,11 +29,11 @@ def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 def generate_launcher(config):
-    if str(config.launcherType) == "":
+    if str(config['LauncherType']) == "":
         generated = "first thing"
-    elif str(config.launcherType) == "":
+    elif str(config['LauncherType']) == "":
         generated = "second thing"
-    elif str(config.launcherType) == "":
+    elif str(config['LauncherType']) == "":
         generated = "third thing"
     else:
         print("Don't know how to handle launcher of type: " + str(config.launcherType))
@@ -43,11 +43,11 @@ def generate_launcher(config):
     return generated
     
 def edit_launcher(config):
-     if str(config.launcherType) == "":
+     if str(config['LauncherType']) == "":
         generated = "first thing"
-    elif str(config.launcherType) == "":
+    elif str(config['LauncherType']) == "":
         generated = "second thing"
-    elif str(config.launcherType) == "":
+    elif str(config['LauncherType']) == "":
         generated = "third thing"
     else:
         print("Don't know how to handle launcher of type: " + str(config.launcherType))
@@ -291,9 +291,9 @@ for launcher in covenant['launchers']:
         listener_id=listener.id
         
     # Find first object in list that matches value..
-    covenantLauncher = next((x for x in covenant_launchers if x.type == str(launcherObject['LauncherType'])), None)
-    if covenantLauncher:
-        print("Updating existing listener: " + str(covenantLauncher.name))
+    covenantLauncherType = next((x for x in covenant_launchers if x.type == str(launcherObject['LauncherType'])), None)
+    if covenantLauncherType:
+        print("Updating existing listener: " + str(covenantLauncherType.name))
     else:
         print("Attempting to create new launcher:" + str(launcherObject['LauncherType']))
      
@@ -306,7 +306,7 @@ for launcher in covenant['launchers']:
 
     
     try:
-        if launchertype:
+        if covenantLauncherType:
             print("Attempting to update " + str(launcherObject['LauncherType']) + " Launcher")
             createdlauncher = edit_launcher(covenantlauncher)
         else:
@@ -317,7 +317,7 @@ for launcher in covenant['launchers']:
         print("Could not create launcher: %s\n" % e)
 
     
-    if createdlauncher and str(launcherObject['powerShell']):
+    if createdlauncher and str(launcherObject['LauncherType']) == "powerShell":
         print("Attempting to generate powershell from launcher")
         try:
             generatedlauncher = launcher_api.generate_power_shell_launcher()
