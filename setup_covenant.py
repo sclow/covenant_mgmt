@@ -190,7 +190,6 @@ if covenant['templates'] is not None:
             exit()
 
 print("")
-exit()
 
 print("Creating Listeners:")
 listener_types = listener_api.get_listener_types()
