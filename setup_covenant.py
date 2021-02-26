@@ -28,6 +28,12 @@ def getConnectionAddresses(listenerObject):
 def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
+def generate_launcher(config):
+    pprint(config)
+    
+def edit_launcher(config):
+    pprint(config)
+    
 config_file = 'config.yml'
 
 if  path.isfile(config_file):
@@ -237,7 +243,7 @@ for listener in covenant['listeners']:
     else:
         print ("Unknown listener type")
 
-launcher_types = launcher_api.get_launchers()
+covenant_launchers = launcher_api.get_launchers()
 implant_templates = implant_template_api.get_implant_templates()
 listeners = listener_api.get_listeners()
 
@@ -263,22 +269,13 @@ for launcher in covenant['launchers']:
         listener_id=listener.id
         
     # Find first object in list that matches value..
-    launchertype = next((x for x in launcher_types if x.type == str(launcherObject['LauncherType'])), None)
-    if launchertype:
-        print("Updating existing listener: " + str(launchertype.name))
-        launchertype_name = launchertype.name
-        
-        # TODO: identify if there is unique id to update
-        covenantlauncher = CovenantLauncher(    id="",
-                                                name=launchertype_name, 
-                                                type=str(launcherObject['LauncherType']), 
-                                                dot_net_version=str(launcherObject['DotNetVersion']),
-                                                kill_date=str(datetime.now() + timedelta(days=launcherObject['LifeInDays'])), 
-                                                listener_id=listener_id , 
-                                                implant_template_id=implant_template_id)
-     else:
+    covenantLauncher = next((x for x in covenant_launchers if x.type == str(launcherObject['LauncherType'])), None)
+    if covenantLauncher:
+        print("Updating existing listener: " + str(covenantLauncher.name))
+    else:
         print("Attempting to create new launcher:" + str(launcherObject['LauncherType']))
-        covenantlauncher = CovenantLauncher(name=str(launcherObject['LauncherType']), 
+     
+    covenantlauncher = CovenantLauncher(name=str(launcherObject['LauncherType']), 
                                                 type=str(launcherObject['LauncherType']), 
                                                 dot_net_version=str(launcherObject['DotNetVersion']),
                                                 kill_date=str(datetime.now() + timedelta(days=launcherObject['LifeInDays'])), 
@@ -289,10 +286,10 @@ for launcher in covenant['launchers']:
     try:
         if launchertype:
             print("Attempting to update " + str(launcherObject['LauncherType']) + " Launcher")
-            createdlauncher = launcher_api.edit_power_shell_launcher(body=covenantlauncher)
+            createdlauncher = edit_launcher(covenantlauncher)
         else:
             print("Attempting to create " + str(launcherObject['LauncherType']) + " Launcher")
-            createdlauncher = launcher_api.create_power_shell_launcher(body=covenantlauncher)
+            createdlauncher = generate_launcher(covenantlauncher)
             
     except ApiException as e:
         print("Could not create launcher: %s\n" % e)
