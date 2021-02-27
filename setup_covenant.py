@@ -28,6 +28,54 @@ def getConnectionAddresses(listenerObject):
 def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
+def create_launcher(config):
+    # This def needs to be re-written to create launchers in cobbr's version
+    # Otherwise we cannot update an existing launcher
+    if str(config.type) == "powerShell":
+        #FUBAR'd
+        newLauncher = launcher_api.generate_power_shell_launcher()
+        config.id = newLauncher.id
+        generated = launcher_api.edit_power_shell_launcher_with_http_info(body=config)
+    elif str(config.type) == "":
+        generated = "second thing"
+    elif str(config.type) == "":
+        generated = "third thing"
+    else:
+        print("Don't know how to handle launcher of type: " + str(config.type))
+        exit()
+    return generated
+    
+def edit_launcher(config):
+    if str(config.type) == "msBuild":
+        generated = launcher_api.edit_ms_build_launcher(body=config)
+    elif str(config.type) == "powerShell":
+        generated = launcher_api.edit_power_shell_launcher(body=config)
+    elif str(config.type) == "shellCode":
+        generated = launcher_api.edit_shell_code_launcher(body=config)
+    elif str(config.type) == "serviceBinary":
+        #generated = launcher_api.edit_power_shell_launcher(body=config)
+        generated = "uh oh, dont know this one!"
+        exit()
+    elif str(config.type) == "binary":
+        generated = launcher_api.edit_binary_launcher(body=config)
+    elif str(config.type) == "installUtil":
+        generated = launcher_api.edit_install_util_launcher(body=config)
+    elif str(config.type) == "wmic":
+        generated = launcher_api.edit_wmic_launcher(body=config)
+    elif str(config.type) == "regsvr32":
+        generated = launcher_api.edit_regsvr32_launcher(body=config)
+    elif str(config.type) == "mshta":
+        generated = launcher_api.edit_mshta_launcher(body=config)
+    elif str(config.type) == "cscript":
+        generated = launcher_api.edit_cscript_launcher(body=config)
+    elif str(config.type) == "wscript":
+        generated = launcher_api.edit_wscript_launcher(body=config)
+    else:
+        print("Don't know how to handle launcher of type: " + str(config.type))
+        exit()
+    
+    return generated
+    
 config_file = 'config.yml'
 
 if  path.isfile(config_file):
@@ -195,7 +243,6 @@ print("Creating Listeners:")
 listener_types = listener_api.get_listener_types()
 listener_profiles = profile_api.get_profiles()
 
-
 for listener in covenant['listeners']:
     listenerObject = covenant['listeners'][listener]
     if listenerObject['listenerType'] == "HTTP":
@@ -237,7 +284,7 @@ for listener in covenant['listeners']:
     else:
         print ("Unknown listener type")
 
-launcher_types = launcher_api.get_launchers()
+covenant_launchers = launcher_api.get_launchers()
 implant_templates = implant_template_api.get_implant_templates()
 listeners = listener_api.get_listeners()
 
@@ -250,14 +297,10 @@ for existinglistener in listeners:
             print("Could not delete listener: %s\n" % e)
 
 print("")
+
 print("Building Launchers:")
 for launcher in covenant['launchers']:
     launcherObject = covenant['launchers'][launcher]
-
-    # Find first object in list that matches value..
-    launchertype = next((x for x in launcher_types if x.type == str(launcherObject['LauncherType'])), None)
-    if launchertype:
-        launchertype_name = launchertype.name
     
     implant_template = next((x for x in implant_templates if x.name == str(launcherObject['ImplantTemplate'])), None)
     if implant_template:
@@ -266,62 +309,73 @@ for launcher in covenant['launchers']:
     listener = next((x for x in listeners if x.status == "active" and x.name == str(launcherObject['ListenerName'])), None)
     if listener:
         listener_id=listener.id
+        
+    # Find first object in list that matches value..
+    covenantLauncherType = next((x for x in covenant_launchers if x.type == str(launcherObject['LauncherType'])), None)
+    if covenantLauncherType:
+        print("Updating existing launcher: " + str(covenantLauncherType.name))
+    else:
+        print("Attempting to create new launcher: " + str(launcherObject['LauncherType']))
 
-
-    covenantlauncher = CovenantLauncher(name=launchertype_name, 
-                                        type=str(launcherObject['LauncherType']), 
-                                        dot_net_version=str(launcherObject['DotNetVersion']),
-                                        kill_date=str(datetime.now() + timedelta(days=launcherObject['LifeInDays'])), 
-                                        listener_id=listener_id , 
-                                        implant_template_id=implant_template_id)
-
-    print("Attempting to create Powershell Launcher")
+    covenantlauncher = CovenantLauncher(    name=str(launcher), 
+                                            type=str(launcherObject['LauncherType']), 
+                                            dot_net_version=str(launcherObject['DotNetVersion']),
+                                            kill_date=str(datetime.now() + timedelta(days=launcherObject['LifeInDays'])), 
+                                            listener_id=listener_id , 
+                                            implant_template_id=implant_template_id
+                                        )
     try:
-        createdlauncher = launcher_api.edit_power_shell_launcher(body=covenantlauncher)
-    except ApiException as e:
-        print("Could not create launcher: %s\n" % e)
+        if covenantLauncherType:
+            print("Attempting to update " + str(launcherObject['LauncherType']) + " Launcher")
+            createdlauncher = edit_launcher(covenantlauncher)
+        else:
+            print("Attempting to create " + str(launcherObject['LauncherType']) + " Launcher")
+            createdlauncher = create_launcher(covenantlauncher)
 
-    print("Attempting to generate powershell from launcher")
-    if createdlauncher:
-        try:
-            generatedlauncher = launcher_api.generate_power_shell_launcher()
-        except ApiException as e:
-            print("Could not create launcher: %s\n" % e)
 
-        if str(launcherObject['HostedURI']):
-            print("Attempting to host launcher on: " + str(launcherObject['HostedURI']))
-            
-            base64_command="".join( chr(x) for x in base64.b64encode(str(generatedlauncher.power_shell_code).encode()))
-            
-            hosted_files = listener_api.get_hosted_files(listener_id)
-            hostedfile = next((x for x in hosted_files if x.path == str(launcherObject['HostedURI']) ), None)
-            
-            if hostedfile:
-                hostedfile_id=hostedfile.id
-                hosted_launcher = CovenantHostedFile( 
-                                                    id=hostedfile_id,  
-                                                    listener_id = listener_id, 
-                                                    path = str(launcherObject['HostedURI']),
-                                                    content = base64_command
-                                                    )
-            else:
-                hosted_launcher = CovenantHostedFile(   
-                                                    listener_id = listener_id, 
-                                                    path = str(launcherObject['HostedURI']),
-                                                    content = base64_command
-                                                    )
-
-            print()
-           
+        if createdlauncher and str(launcherObject['LauncherType']) == "powerShell":
+            print("Attempting to generate powershell from launcher")
             try:
-                if hostedfile:
-                    hostedlauncher = listener_api.edit_hosted_file(listener_id, body=hosted_launcher)
-                else:
-                    hostedlauncher = listener_api.create_hosted_file(listener_id, body=hosted_launcher)
-                
+                generatedlauncher = launcher_api.generate_power_shell_launcher()
             except ApiException as e:
-                print("Could not create hosted launcher: %s\n" % e)
+                print("Could not create launcher: %s\n" % e)
+
+            if str(launcherObject['HostedURI']):
+                print("Attempting to host launcher on: " + str(launcherObject['HostedURI']))
+                
+                base64_command="".join( chr(x) for x in base64.b64encode(str(generatedlauncher.power_shell_code).encode()))
+                
+                hosted_files = listener_api.get_hosted_files(listener_id)
+                hostedfile = next((x for x in hosted_files if x.path == str(launcherObject['HostedURI']) ), None)
+                
+                if hostedfile:
+                    hostedfile_id=hostedfile.id
+                    hosted_launcher = CovenantHostedFile( 
+                                                        id=hostedfile_id,  
+                                                        listener_id = listener_id, 
+                                                        path = str(launcherObject['HostedURI']),
+                                                        content = base64_command
+                                                        )
+                else:
+                    hosted_launcher = CovenantHostedFile(   
+                                                        listener_id = listener_id, 
+                                                        path = str(launcherObject['HostedURI']),
+                                                        content = base64_command
+                                                        )
+
+                print()
             
+                try:
+                    if hostedfile:
+                        hostedlauncher = listener_api.edit_hosted_file(listener_id, body=hosted_launcher)
+                    else:
+                        hostedlauncher = listener_api.create_hosted_file(listener_id, body=hosted_launcher)
+                    
+                except ApiException as e:
+                    print("Could not create hosted launcher: %s\n" % e)
+
+    except ApiException as e:
+        print("Could not create launcher: %s\n" % e)            
 
 print("")
 if covenant['hosted_files'] is not None:
