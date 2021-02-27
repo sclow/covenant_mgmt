@@ -298,10 +298,6 @@ for existinglistener in listeners:
 
 print("")
 
-for boom in covenant_launchers:
-    pprint(boom.type)
-
-exit()
 print("Building Launchers:")
 for launcher in covenant['launchers']:
     launcherObject = covenant['launchers'][launcher]
