@@ -29,28 +29,28 @@ def str2bool(s):
     return s.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
 
 def generate_launcher(config):
-    if str(config['LauncherType']) == "powerShell":
+    if str(config.name) == "powerShell":
         generated = launcher_api.generate_power_shell_launcher(body=config)
-    elif str(config['LauncherType']) == "":
+    elif str(config.name) == "":
         generated = "second thing"
-    elif str(config['LauncherType']) == "":
+    elif str(config.name) == "":
         generated = "third thing"
     else:
-        print("Don't know how to handle launcher of type: " + str(config.launcherType))
+        print("Don't know how to handle launcher of type: " + str(config.name))
         exit()
     
     #pprint(generated)
     return generated
     
 def edit_launcher(config):
-     if str(config['LauncherType']) == "powerShell":
+    if str(config.name) == "powerShell":
         generated = launcher_api.edit_power_shell_launcher(body=config)
-    elif str(config['LauncherType']) == "":
+    elif str(config.name) == "":
         generated = "second thing"
-    elif str(config['LauncherType']) == "":
+    elif str(config.name) == "":
         generated = "third thing"
     else:
-        print("Don't know how to handle launcher of type: " + str(config.launcherType))
+        print("Don't know how to handle launcher of type: " + str(config.name))
         exit()
     
     #pprint(generated)
@@ -295,7 +295,7 @@ for launcher in covenant['launchers']:
     if covenantLauncherType:
         print("Updating existing listener: " + str(covenantLauncherType.name))
     else:
-        print("Attempting to create new launcher:" + str(launcherObject['LauncherType']))
+        print("Attempting to create new launcher: " + str(launcherObject['LauncherType']))
      
     covenantlauncher = CovenantLauncher(name=str(launcherObject['LauncherType']), 
                                                 type=str(launcherObject['LauncherType']), 
