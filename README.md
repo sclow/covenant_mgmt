@@ -60,6 +60,17 @@ E.g. for a Covenant instance running on "https://kali:7443/" you can access the 
 **Note:** Templates defined in this section will overwrite whatever is in your current Covenant instance without prompting. 
 Test carefully in a Lab before using custom Templates on a live exercise; think very carefully before updating the templates whilst "inflight".
 
+#### ZPS fork / Cobbr (core) 0.6
+The relationship between a template and the type of implant it applies to cannot be updated via the API (fixed in dev / 0.7), therefore when you modify a template you break that link, hence you cannot use that template to build a launcher.
+This can be simply fixed by opening each template and recreating that link (e.g. to HTTP/Bridge) as needed (see https://github.com/cobbr/Covenant/issues/158).
+
+If you fail to recreate these links then you won't be able to create a launcher that uses that template (potentially 'crashing' the UI). Recreating the link resolves that issue.
+
+#### Core (Cobbr) Dev
+The template code assumes that launchers already exist for each launcher type; this is true for 0.6 and ZPS fork but the db initialisation for Dev does not create them (nor is that trivial via the API). 
+
+Either create manually or apply the ZPS.sql to your database to have them created.
+
 ## Cleanup Dead / Hidden Grunts
 Performance issues can appear if the Covenant DB starts to get too large; if you have a lot of dead / hidden GRUNTS that you are no longer using you can purge them using the command:
 

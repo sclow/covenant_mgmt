@@ -1,17 +1,9 @@
 config.yml
 files/*hta
 files/*doc
+files/*txt
 templates/*json
 cert/covenant*
-cert/backup/covenant.crt
-cert/backup/covenant.key
-cert/backup/covenant.pass
-cert/backup/covenant.pem
-cert/backup/covenant.pfx
-cert/backup/suls.pem
-files/LAN-HTTP.txt
-files/OSEP-HTTP.txt
-files/OSEP-HTTPS.txt
-supporting/patch_284/patch_284.sh
+cert/backup/*
 config - Copy.yml
-files/GruntHTTP.yaml
+
