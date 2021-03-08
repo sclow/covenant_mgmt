@@ -8,7 +8,7 @@ set EXITFUNC thread
 set EXITONSESSION false
 set OverrideRequestHost true
 set ReverseListenerBindAddress 127.0.0.1
-set ReverseListenerBindPort 6667
+set ReverseListenerBindPort 6665
 run -j 
 use auxiliary/server/socks_proxy
 run -j
