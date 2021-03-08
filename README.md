@@ -52,7 +52,7 @@ Once you are happy with your Custom GRUNT template use the swagger_api to back t
 E.g. for a Covenant instance running on "https://kali:7443/" you can access the Swagger UI at "https://kali:7443/swagger/", authenticate (POST /api/users/login) and set your Bearer to allow other commands.
 
 * Authenticate!
-* GET (​/api​/implanttemplates​/{id}) Each of your templates (by default only 4)
+* GET (/api/implanttemplates/{id}) Each of your templates (by default only 4)
 * Save the template to templates/${TemplateName}.json (expanding ${TemplateName} as you do so)
 * Configure the "templates" stanza of config.yml to point to "${TemplateName}.json" (or whatever name you saved it as) within the "templates/" folder.
 * Run ```./setup_covenant.py``` to deploy custom templates with your configuration.
