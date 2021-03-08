@@ -2,6 +2,7 @@ config.yml
 files/*hta
 files/*doc
 files/*txt
+files/*ps1
 templates/*json
 cert/covenant*
 cert/backup/*
