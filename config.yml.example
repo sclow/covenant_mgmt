@@ -18,7 +18,7 @@ listeners:
           bindAddress: 127.0.0.1
           bindPort: 6666
           connectAddressesType: auto # "manual" or "auto"
-          connectAddresses: ["10.8.0.182"] # only used if "manual"
+          connectAddresses: ["10.8.0.xxx"] # only used if "manual"
           connectAddressesInterface: tun0
           connectPort: 80
           profile: "DefaultHttpProfile"
@@ -39,15 +39,15 @@ launchers:
           LauncherType: "powerShell"
           HostedURI: "/GruntHTTPStager.ps1"
 
-hosted_files:
-     hta_exploit:
-          ListenerName: "CRTO-Lab-HTTP"
-          HostedURI: "/overdue/login.hta"
-          SrcFile: "files/login.hta"
-     doc_exploit:
-          ListenerName: "CRTO-Lab-HTTP"
-          HostedURI: "/overdue/Invoice-0091662.doc"
-          SrcFile: "files/Invoice-0091662.doc"
+#hosted_files:
+#     hta_exploit:
+#          ListenerName: "CRTO-Lab-HTTP"
+#          HostedURI: "/login.hta"
+#          SrcFile: "files/login.hta"
+#     doc_exploit:
+#          ListenerName: "CRTO-Lab-HTTP"
+#          HostedURI: "/DodgyWordDoc.doc"
+#          SrcFile: "files/DodgyWordDoc.doc"
 
 profiles:
      english-cookies:
