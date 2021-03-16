@@ -7,7 +7,7 @@ $URL=$MyInvocation.MyCommand -Replace $EGG, $HUNT
 if (-not $([Environment]::Is64BitProcess) -and $([Environment]::Is64BitOperatingSystem)){
     # Not running as 64 bit process but is running on a 64 bit OS, Upgrade via sysnative
     #Write-Output("Upgrade's due")
-	$ps64 = (join-path -Path ($pshome -replace "syswow64", "sysnative") -ChildPath "powershell.exe")
+    $ps64 = (join-path -Path ($pshome -replace "syswow64", "sysnative") -ChildPath "powershell.exe")
     $ENCODED=[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($URL))
     Write-Output('Start-Process -FilePath $ps64 -ArgumentList "-enc $ENCODED"')
 
