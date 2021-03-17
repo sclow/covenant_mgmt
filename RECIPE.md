@@ -42,6 +42,7 @@ cd /opt/Covenant/Covenant
 /usr/bin/dotnet run
 ```
 6: Check Covenant works with your existing DB and everything is as expected.
+
 7: Compile and test a Production release of Coventant
 ```
 /usr/bin/dotnet publish -c Release
