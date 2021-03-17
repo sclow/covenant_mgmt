@@ -15,6 +15,7 @@ My conclusions so far:
   * Publishing and running Covenant in release mode improves performance.
 
 So my recipe for "better" Covenant experience would be:
+
 0: Back everything up! (snapshots /copies / whatever floats your boat)
 
 1: Increase RAM for Kali (8Gb good, 16+ better :))
