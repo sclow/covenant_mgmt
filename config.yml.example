@@ -39,7 +39,7 @@ launchers:
           LauncherType: "powerShell"
           HostedURI: "/GruntHTTPStager.ps1"
 
-#hosted_files:
+hosted_files:
 #     hta_exploit:
 #          ListenerName: "CRTO-Lab-HTTP"
 #          HostedURI: "/login.hta"
