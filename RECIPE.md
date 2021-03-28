@@ -6,17 +6,20 @@ So I have done (quite a lot) of digging to try to get the "ultimate" Covenant re
 
 My conclusions so far:
 * DB access in Covenant can cause significant memory spikes, the OOM-Killer in Kali will terminate those threads leaving you with inconsistent database content.
-** This is noticeable with the "Stage-0" grunt's never completing
+  * This is noticeable with the "Stage-0" grunt's never completing
 * ZPS version of Covenant is much better than 0.6 Core, however lots of movement in the "dev" branch mean it is worth watching (but not using at this moment)
-** Rasta; thanks for putting the fork together it is a significant improvement!!
+  * Rasta; thanks for putting the fork together it is a significant improvement!!
 * The kali.sh script deploys the MS repo for Ubuntu 19.04
-** Kali seems better aligned to Debian 10, which contains dotnet 18.7 instead of 18.4
+  * Kali seems better aligned to Debian 10, which contains dotnet 18.7 instead of 18.4
 * "dotnet run" launches the Covenant framework in "debugging mode"; this is great for troubleshooting .... but uses more memory.
-** Publishing and running Covenant in release mode improves performance.
+  * Publishing and running Covenant in release mode improves performance.
 
 So my recipe for "better" Covenant experience would be:
+
 0: Back everything up! (snapshots /copies / whatever floats your boat)
+
 1: Increase RAM for Kali (8Gb good, 16+ better :))
+
 2: Remove Dotnet from Ubuntu 19.04 repo:
 ```
 sudo apt remove dotnet*
@@ -42,6 +45,7 @@ cd /opt/Covenant/Covenant
 /usr/bin/dotnet run
 ```
 6: Check Covenant works with your existing DB and everything is as expected.
+
 7: Compile and test a Production release of Coventant
 ```
 /usr/bin/dotnet publish -c Release
