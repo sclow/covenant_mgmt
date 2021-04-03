@@ -80,6 +80,41 @@ def manage_database():
     if config["systemd"]:   
         systemd_start()
 
+def fix_failed_screenshot(cursor):
+    print("Fix Base64 Decode Error due to failed screenshot")
+    print()
+    
+    rows = cursor.execute("SELECT ID, Discriminator, FileName, length(FileContents) FROM Events WHERE Discriminator='ScreenshotEvent' AND FileContents like 'System.ComponentModel.Win32Exception: The handle is invalid%' ").fetchall()
+    if len(rows):
+        print("ID: Discriminator: FileName: Character Lengh of FileContents")
+        options=[]
+
+        terminal_rows, terminal_columns = os.popen('stty size', 'r').read().split()
+        for row in rows:
+            row_filename=f"{str(row[2])}"
+            max_filename_length = (50 * int(terminal_columns)) // 100
+            if len(row_filename) < max_filename_length:
+                string_row = f"{str(row[0])}: {str(row[1])}: {row_filename}: ({str(row[3])}) Chars"
+            else:
+                shortened_filename="..." + row_filename[-max_filename_length:]
+                string_row = f"{str(row[0])}: {str(row[1])}: {shortened_filename}: ({str(row[3])}) Chars" 
+
+            options.append(string_row)
+
+        choices = enquiries.choose("Select a record to truncate...", options, multi=True)
+
+        for choice in choices:
+            truncation_record = re.split(r':\s', choice)
+            if enquiries.confirm('Do you want to resolve {} ({})?'.format(str(truncation_record[0]),str(truncation_record[2]))):  
+                print("Attempt to fix record: " + str(truncation_record[0]) )
+                update_screenshots_in_events_table(cursor, truncation_record[0])
+    else:
+        print("Could not find any matching records showing evidence of stack trace where a SreenShot should be.")
+
+    print("")
+    fix_bad_things_menu(cursor)
+
+
 def fix_base64_decode_error(cursor):
     print("Fix Base64 Decode Error due to failed downloads")
     print()
@@ -211,6 +246,7 @@ def fix_bad_things_menu(cursor):
         "Fix Stack trace in event error",
         "Truncate downloaded files in Events table",
         "Truncate downloaded files in CommandOutputs table",
+        "Fix failed screenshot download",
         "Exit, save and quit"
     ]
 
@@ -224,7 +260,15 @@ def fix_bad_things_menu(cursor):
     elif response == options[3]:
         truncate_downloaded_files_commandoutputs_table(cursor)
     elif response == options[4]:
+        fix_failed_screenshot(cursor)
+    elif response == options[5]:
         print("Exiting....")
+
+def update_screenshots_in_events_table(cursor, id):
+    sql = ''' UPDATE Events
+              SET FileContents = ? 
+              WHERE id = ?'''
+    cursor.execute(sql, ("", id))   
 
 def update_downloads_in_events_table(cursor, id):
     sql = ''' UPDATE Events
